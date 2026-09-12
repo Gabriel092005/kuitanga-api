@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export async function  authenticate(request:FastifyRequest,reply:FastifyReply){
     const authenticateBodySchema  = z.object({
-        email : z.string().email(),
+        email : z.string().min(3).max(255).regex(/^[^@\s]+@[^@\s]+\.[^@\s]+$/),
         password: z.string(),
     })
     const {email,password} = authenticateBodySchema.parse(request.body)

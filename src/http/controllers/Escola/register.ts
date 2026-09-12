@@ -7,7 +7,7 @@ import { z } from "zod";
 export async function  register(request:FastifyRequest,reply:FastifyReply){
     const registerBodySchema  = z.object({
         name: z.string().min(5),
-        email : z.string().email(),
+        email : z.string().min(3).max(255).regex(/^[^@\s]+@[^@\s]+\.[^@\s]+$/),
         adress: z.string(),
         Description: z.string()
     })

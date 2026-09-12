@@ -69,6 +69,7 @@ model User {
   Exame         Exame[]
   feedback      feedback[]
   notificacao   notificacao[]
+  aulaAoVivo    aulaAoVivo[]
 
   @@map("users")
 }
@@ -121,4 +122,34 @@ model notificacao {
   user    User   @relation(fields: [userId], references: [id])
   userId  String
   @@map("notif")
+}
+
+model aulaAoVivo {
+  id        String             @id @default(uuid())
+  tema      String
+  materia   String
+  professor String            @default("A confirmar")
+  data      DateTime
+  hora      String
+  status    StatusAgendamentos @default(AGENDADO)
+  user      User               @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime           @default(now())
+
+  @@map("aulas_ao_vivo")
+}
+
+model aula {
+  id            Int      @id @default(autoincrement())
+  titulo        String
+  professor     String
+  materia       String
+  duracao       String
+  visualizacoes Int      @default(0)
+  data          String
+  thumbnail     String   @default("azul")
+  descricao     String
+  topicos       String[]
+
+  @@map("aulas")
 }

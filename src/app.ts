@@ -9,6 +9,8 @@ import { fastifyJwt } from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import { feedbackRoutes } from "./http/controllers/feedback/routes";
+import { aulaAoVivoRoutes } from "./http/controllers/AulaAoVivo/routes";
+import { aulaRoutes } from "./http/controllers/Aula/routes";
 
 
 
@@ -25,6 +27,8 @@ app.register(userRoutes)
 app.register(schoolRoutes)
 app.register(matriculaRoutes)
 app.register(feedbackRoutes)
+app.register(aulaAoVivoRoutes)
+app.register(aulaRoutes)
 app.register(fastifyCookie)
 
 app.register(fastifyJwt,{
@@ -34,7 +38,7 @@ app.register(fastifyJwt,{
         signed:false,
     },
     sign:{
-        expiresIn:'10min'
+        expiresIn:'1d'
     }
 },
    

@@ -10,7 +10,7 @@ export async function Register(request:FastifyRequest,reply:FastifyReply) {
 
     const RegisterBodySchema = z.object({
        nome : z.string(),
-       email : z.string().email(),
+       email : z.string().min(3).max(255).regex(/^[^@\s]+@[^@\s]+\.[^@\s]+$/),
        password_hash: z.string().min(6),
        number:z.string()
       
