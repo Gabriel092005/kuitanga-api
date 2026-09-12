@@ -12,6 +12,9 @@ async function main() {
       role: Role.ADMIN,
       Aluno: Aluno.ALUNO,
     },
+
+
+    
     {
       nome: "Professor Ana",
       email: "professor@kuitanga.com",
