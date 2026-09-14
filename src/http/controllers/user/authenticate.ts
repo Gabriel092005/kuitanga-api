@@ -49,6 +49,7 @@ export async function  authenticate(request:FastifyRequest,reply:FastifyReply){
                 email: user.email,
                 role: user.role,
                 Aluno: user.Aluno,
+                turmaId: user.turmaId,
             },
         })
    

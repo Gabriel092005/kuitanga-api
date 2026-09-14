@@ -1,4 +1,4 @@
-import { PrismaClient, Role, Aluno, School } from "@prisma/client";
+import { PrismaClient, Role, Aluno, School, StatusMatricula } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +20,7 @@ async function main() {
       email: "professor@kuitanga.com",
       password_hash: "prof123",
       number: "+244 900 000 002",
-      role: Role.MEMBER,
+      role: Role.PROFESSOR,
       Aluno: Aluno.ALUNO,
     },
     {
@@ -81,9 +81,98 @@ async function main() {
     });
   }
 
+  const matriculasDemo = [
+    { email: "admin@kuitanga.com", escolaEmail: "primaria@kuitanga.com" },
+    { email: "professor@kuitanga.com", escolaEmail: "primaria@kuitanga.com" },
+    { email: "aluno@kuitanga.com", escolaEmail: "primaria@kuitanga.com" },
+  ];
+
+  for (const { email, escolaEmail } of matriculasDemo) {
+    const user = await prisma.user.findUnique({ where: { email } });
+    const escola = await prisma.escola.findUnique({ where: { email: escolaEmail } });
+    if (user && escola) {
+      const existe = await prisma.matricula.findFirst({
+        where: { userId: user.id, escolaId: escola.id },
+      });
+      if (!existe) {
+        await prisma.matricula.create({
+          data: { userId: user.id, escolaId: escola.id, status: StatusMatricula.CONFIRMADO },
+        });
+      }
+    }
+  }
+
+  const professorAna = await prisma.user.findUnique({
+    where: { email: "professor@kuitanga.com" },
+  });
+
+  const primaria = await prisma.escola.findUnique({
+    where: { email: "primaria@kuitanga.com" },
+  });
+
+  const turmasDemo = [
+    { nome: "Jardim A", materia: "Matematica" },
+    { nome: "Jardim B", materia: "Portugues" },
+    { nome: "2a Classe A", materia: "Historia" },
+  ];
+
+  if (professorAna && primaria) {
+    for (const t of turmasDemo) {
+      const existe = await prisma.turma.findFirst({
+        where: { nome: t.nome, professorId: professorAna.id },
+      });
+      if (!existe) {
+        await prisma.turma.create({
+          data: { ...t, professorId: professorAna.id, escolaId: primaria.id },
+        });
+      }
+    }
+  }
+
   const professor = await prisma.user.findUnique({
     where: { email: "professor@kuitanga.com" },
   });
+
+  await prisma.user.update({
+    where: { email: "professor@kuitanga.com" },
+    data: { role: Role.PROFESSOR },
+  });
+
+  const alunoPedro = await prisma.user.findUnique({
+    where: { email: "aluno@kuitanga.com" },
+  });
+
+  const escolaPrimaria = await prisma.escola.findUnique({
+    where: { email: "primaria@kuitanga.com" },
+  });
+
+  let turmaPrimariaId: string | null = null;
+  if (professor && escolaPrimaria) {
+    const turma = await prisma.turma.findFirst({
+      where: { nome: "6ª A", escolaId: escolaPrimaria.id },
+    });
+    if (turma) {
+      turmaPrimariaId = turma.id;
+    } else {
+      const nova = await prisma.turma.create({
+        data: {
+          nome: "6ª A",
+          materia: "Matematica",
+          status: "ativo",
+          professorId: professor.id,
+          escolaId: escolaPrimaria.id,
+        },
+      });
+      turmaPrimariaId = nova.id;
+    }
+  }
+
+  if (alunoPedro && turmaPrimariaId) {
+    await prisma.user.update({
+      where: { id: alunoPedro.id },
+      data: { turmaId: turmaPrimariaId },
+    });
+  }
 
   const aulasDemo = [
     {
@@ -107,122 +196,130 @@ async function main() {
       const existe = await prisma.aulaAoVivo.findFirst({
         where: { tema: aula.tema },
       });
-      if (!existe) {
+      if (existe) {
+        await prisma.aulaAoVivo.update({
+          where: { id: existe.id },
+          data: {
+            data: aula.data,
+            userId: professor.id,
+            turmaId: turmaPrimariaId ?? undefined,
+          },
+        });
+      } else {
         await prisma.aulaAoVivo.create({
           data: {
             ...aula,
             userId: professor.id,
+            turmaId: turmaPrimariaId ?? undefined,
           },
         });
       }
     }
   }
 
-  const aulasGravadasDemo = [
+  const atividadesDemo = [
     {
-      titulo: "Introducao a Algebra - Variaveis e Expressoes",
-      professor: "Prof. Ana Martins",
+      titulo: "Adicao com Figuras",
       materia: "Matematica",
-      duracao: "32:15",
-      visualizacoes: 1243,
-      data: "22 Jul 2026",
-      thumbnail: "azul",
-      descricao:
-        "Aprenda os conceitos basicos de algebra, variaveis e como resolver expressoes simples. Nesta aula vamos cobrir operacoes fundamentais e aplicacoes no dia a dia.",
-      topicos: ["O que sao variaveis", "Expressoes algebraicas", "Resolucao de equacoes simples", "Exercicios praticos"],
+      pontos: 20,
+      dificuldade: "Facil",
+      tempoEstimado: "10 min",
+      descricao: "Pratique operacoes de adicao usando figuras geometricas como referencia.",
+      cor: "azul",
+      icone: "calculator",
+      perguntas: [
+        { pergunta: "Quanto e 3 + 4?", expressao: "3 + 4 = ?", opcoes: ["5", "6", "7", "8"], resposta: 2 },
+        { pergunta: "Quanto e 8 + 5?", expressao: "8 + 5 = ?", opcoes: ["11", "12", "13", "14"], resposta: 2 },
+        { pergunta: "Quanto e 6 + 9?", expressao: "6 + 9 = ?", opcoes: ["13", "14", "15", "16"], resposta: 2 },
+        { pergunta: "Quanto e 12 + 7?", expressao: "12 + 7 = ?", opcoes: ["17", "18", "19", "20"], resposta: 2 },
+        { pergunta: "Quanto e 15 + 6?", expressao: "15 + 6 = ?", opcoes: ["19", "20", "21", "22"], resposta: 2 },
+      ],
     },
     {
-      titulo: "Figuras de Linguagem - Metafora e Comparacao",
-      professor: "Prof. Carlos Neto",
+      titulo: "Complete as Palavras",
       materia: "Portugues",
-      duracao: "28:40",
-      visualizacoes: 876,
-      data: "20 Jul 2026",
-      thumbnail: "roxo",
-      descricao:
-        "Entenda as principais figuras de linguagem e como identifical-as em textos literarios e do cotidiano.",
-      topicos: ["Metafora", "Comparacao", "Hipérbole", "Analise de textos"],
+      pontos: 15,
+      dificuldade: "Medio",
+      tempoEstimado: "8 min",
+      descricao: "Complete as palavras com as letras corretas e aprenda novos vocabulos.",
+      cor: "roxo",
+      icone: "pencil",
+      perguntas: [
+        { pergunta: "Complete: C_SA", expressao: "CASA", opcoes: ["A", "E", "I", "O"], resposta: 0 },
+        { pergunta: "Complete: S_LA", expressao: "SALA", opcoes: ["O", "E", "A", "I"], resposta: 0 },
+        { pergunta: "Complete: M_SA", expressao: "MESA", opcoes: ["A", "O", "E", "I"], resposta: 2 },
+        { pergunta: "Complete: L_VRO", expressao: "LIVRO", opcoes: ["A", "I", "E", "O"], resposta: 1 },
+        { pergunta: "Complete: CADEI_A", expressao: "CADEIRA", opcoes: ["R", "L", "S", "T"], resposta: 0 },
+      ],
     },
     {
-      titulo: "O Sistema Solar e seus Planetas",
-      professor: "Prof. Maria Jose",
+      titulo: "Os Cinco Sentidos",
       materia: "Ciencias",
-      duracao: "45:10",
-      visualizacoes: 2105,
-      data: "18 Jul 2026",
-      thumbnail: "verde",
-      descricao:
-        "Uma viagem pelo sistema solar, conhecendo as caracteristicas de cada planeta e seus dados curiosos.",
-      topicos: ["Planetas rochosos", "Gases gigantes", "Cintura de asteroides", "Dados curiosos"],
+      pontos: 20,
+      dificuldade: "Facil",
+      tempoEstimado: "10 min",
+      descricao: "Descubra como funcionam os cinco sentidos do corpo humano.",
+      cor: "verde",
+      icone: "flask",
+      perguntas: [
+        { pergunta: "Qual orgao usamos para ver?", expressao: "Sentido da visao", opcoes: ["Ouvido", "Olho", "Nariz", "Boca"], resposta: 1 },
+        { pergunta: "Qual orgao usamos para ouvir?", expressao: "Sentido da audicao", opcoes: ["Olho", "Nariz", "Ouvido", "Mao"], resposta: 2 },
+        { pergunta: "Qual sentido detecta sabores?", expressao: "Sentido do paladar", opcoes: ["Tato", "Olfato", "Visao", "Paladar"], resposta: 3 },
+        { pergunta: "Com qual sentido sentimos o frio?", expressao: "Sentido do tato", opcoes: ["Tato", "Paladar", "Olfato", "Visao"], resposta: 0 },
+        { pergunta: "Qual orgao detecta cheiros?", expressao: "Sentido do olfato", opcoes: ["Lingua", "Nariz", "Orelha", "Pele"], resposta: 1 },
+      ],
     },
     {
-      titulo: "Geometria Plana - Areas e Perimetros",
-      professor: "Prof. Ana Martins",
-      materia: "Matematica",
-      duracao: "38:22",
-      visualizacoes: 1567,
-      data: "17 Jul 2026",
-      thumbnail: "amarelo",
-      descricao:
-        "Calcule areas e perimetros de figuras planas com exercicios praticos e resolucao passo a passo.",
-      topicos: ["Area do quadrado e retangulo", "Area do circulo", "Perimetros", "Problemas praticos"],
-    },
-    {
-      titulo: "Revolucao Industrial - Impactos na Sociedade",
-      professor: "Prof. Pedro Silva",
-      materia: "Historia",
-      duracao: "41:55",
-      visualizacoes: 934,
-      data: "15 Jul 2026",
-      thumbnail: "laranja",
-      descricao:
-        "Como a revolucao industrial transformou a economia e a sociedade mundial para sempre.",
-      topicos: ["A maquina a vapor", "Mudancas sociais", "Urbanizacao", "Legado historico"],
-    },
-    {
-      titulo: "Continentes e Oceanos do Mundo",
-      professor: "Prof. Lucia Santos",
-      materia: "Geografia",
-      duracao: "35:30",
-      visualizacoes: 1089,
-      data: "14 Jul 2026",
-      thumbnail: "ciano",
-      descricao:
-        "Conheca os continentes, oceanos e as principais caracteristicas geograficas do nosso planeta.",
-      topicos: ["Os 7 continentes", "Oceanos e mares", "Relevo terrestre", "Clima e vegetacao"],
-    },
-    {
-      titulo: "Raciocinio Logico - Padroes e Sequencias",
-      professor: "Prof. Ana Martins",
+      titulo: "Sequencia Logica",
       materia: "Raciocinio",
-      duracao: "26:48",
-      visualizacoes: 756,
-      data: "12 Jul 2026",
-      thumbnail: "rosa",
-      descricao:
-        "Desenvolva seu raciocinio logico com padroes, sequencias e combinatoria.",
-      topicos: ["Sequencias numericas", "Padroes visuais", "Logica dedutiva", "Desafios"],
+      pontos: 25,
+      dificuldade: "Dificil",
+      tempoEstimado: "12 min",
+      descricao: "Resolva sequencias numericas e padroes logicos para treinar o raciocinio.",
+      cor: "rosa",
+      icone: "shapes",
+      perguntas: [
+        { pergunta: "Qual e o proximo numero?", expressao: "2, 4, 6, 8, ?", opcoes: ["9", "10", "11", "12"], resposta: 1 },
+        { pergunta: "Qual e o proximo numero?", expressao: "3, 6, 9, 12, ?", opcoes: ["13", "14", "15", "16"], resposta: 2 },
+        { pergunta: "Qual e o proximo numero?", expressao: "5, 10, 20, 40, ?", opcoes: ["50", "60", "70", "80"], resposta: 3 },
+        { pergunta: "Complete a sequencia", expressao: "A, C, E, G, ?", opcoes: ["H", "I", "J", "K"], resposta: 1 },
+        { pergunta: "Qual e o proximo numero?", expressao: "1, 1, 2, 3, 5, ?", opcoes: ["6", "7", "8", "9"], resposta: 1 },
+      ],
     },
     {
-      titulo: "Especies Animais de Angola",
-      professor: "Prof. Maria Jose",
-      materia: "Ciencias",
-      duracao: "39:12",
-      visualizacoes: 1823,
-      data: "10 Jul 2026",
-      thumbnail: "verde",
-      descricao:
-        "Descubra as especies animais nativas de Angola e seus habitats naturais.",
-      topicos: ["Fauna endemica", "Habitats e ecossistemas", "Animais em risco", "Conservacao"],
+      titulo: "Subtracao Basica",
+      materia: "Matematica",
+      pontos: 20,
+      dificuldade: "Facil",
+      tempoEstimado: "10 min",
+      descricao: "Pratique subtracao com exercicios do nivel basico ao intermediario.",
+      cor: "amarelo",
+      icone: "calculator",
+      perguntas: [
+        { pergunta: "Quanto e 10 - 3?", expressao: "10 - 3 = ?", opcoes: ["5", "6", "7", "8"], resposta: 2 },
+        { pergunta: "Quanto e 15 - 8?", expressao: "15 - 8 = ?", opcoes: ["5", "6", "7", "8"], resposta: 2 },
+        { pergunta: "Quanto e 20 - 12?", expressao: "20 - 12 = ?", opcoes: ["6", "7", "8", "9"], resposta: 2 },
+        { pergunta: "Quanto e 25 - 9?", expressao: "25 - 9 = ?", opcoes: ["14", "15", "16", "17"], resposta: 2 },
+        { pergunta: "Quanto e 30 - 18?", expressao: "30 - 18 = ?", opcoes: ["10", "11", "12", "13"], resposta: 2 },
+      ],
     },
   ];
 
-  for (const aula of aulasGravadasDemo) {
-    const existe = await prisma.aula.findFirst({
-      where: { titulo: aula.titulo },
-    });
-    if (!existe) {
-      await prisma.aula.create({ data: aula });
+  if (professorAna && primaria) {
+    for (const atividade of atividadesDemo) {
+      const existe = await prisma.atividade.findFirst({
+        where: { titulo: atividade.titulo },
+      });
+      if (!existe) {
+        await prisma.atividade.create({
+          data: {
+            ...atividade,
+            professor: professorAna.nome,
+            userId: professorAna.id,
+            escolaId: primaria.id,
+          },
+        });
+      }
     }
   }
 

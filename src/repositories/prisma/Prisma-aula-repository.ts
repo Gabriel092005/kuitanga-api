@@ -1,10 +1,14 @@
 import { Prisma } from "@prisma/client";
-import { aulaRepository } from "../aula-repository";
+import { aulaRepository, listarAulasParams } from "../aula-repository";
 import { prisma } from "@/lib/prisma";
 
 export class PrismaAulaRepository implements aulaRepository {
-  async listar() {
+  async listar({ professorId, turmaId }: listarAulasParams = {}) {
+    const where: Prisma.aulaWhereInput = { videoUrl: { not: null } };
+    if (professorId) where.userId = professorId;
+    else if (turmaId) where.turmaId = turmaId;
     const aulas = await prisma.aula.findMany({
+      where,
       orderBy: { id: "asc" },
     });
     return aulas;
@@ -22,5 +26,11 @@ export class PrismaAulaRepository implements aulaRepository {
       data,
     });
     return aula;
+  }
+
+  async deletar(id: number) {
+    await prisma.aula.delete({
+      where: { id },
+    });
   }
 }

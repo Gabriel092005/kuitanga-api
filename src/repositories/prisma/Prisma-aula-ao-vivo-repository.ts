@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { aulaAoVivoRepository } from "../aula-ao-vivo-repository";
+import { aulaAoVivoRepository, listarAulasAoVivoParams } from "../aula-ao-vivo-repository";
 import { prisma } from "@/lib/prisma";
 
 export class PrismaAulaAoVivoRepository implements aulaAoVivoRepository {
@@ -10,8 +10,15 @@ export class PrismaAulaAoVivoRepository implements aulaAoVivoRepository {
     return aulaAoVivo;
   }
 
-  async listar() {
+  async listar({ professorId, turmaId, userId }: listarAulasAoVivoParams = {}) {
     const aulasAoVivo = await prisma.aulaAoVivo.findMany({
+      where: professorId
+        ? { turma: { professorId } }
+        : turmaId
+          ? { turmaId }
+          : userId
+            ? { userId }
+            : {},
       orderBy: [{ data: "asc" }, { hora: "asc" }],
     });
     return aulasAoVivo;

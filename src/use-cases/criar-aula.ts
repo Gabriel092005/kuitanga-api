@@ -10,7 +10,11 @@ interface criarAulaRequest {
   topicos: string[];
   data?: string;
   thumbnail?: string;
-  visualizacoes?: number;
+visualizacoes?: number;
+  videoUrl?: string;
+  userId?: string;
+  escolaId?: string | null;
+  turmaId?: string | null;
 }
 
 interface criarAulaResponse {
@@ -30,6 +34,10 @@ export class CriarAulaUseCase {
     data,
     thumbnail,
     visualizacoes,
+videoUrl,
+    userId,
+    escolaId,
+    turmaId,
   }: criarAulaRequest): Promise<criarAulaResponse> {
     const aula = await this.aulaRepository.criar({
       titulo,
@@ -41,6 +49,10 @@ export class CriarAulaUseCase {
       data: data || "1 Set 2026",
       thumbnail: thumbnail || "azul",
       visualizacoes: visualizacoes || 0,
+videoUrl,
+      userId,
+      escolaId,
+      turmaId,
     });
 
     return { aula };

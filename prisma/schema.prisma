@@ -27,6 +27,7 @@ enum StatusMatricula {
 enum Role {
   ADMIN
   MEMBER
+  PROFESSOR
 }
 
 enum Aluno {
@@ -52,6 +53,9 @@ model escola {
   agendamentos agendamentos[]
   feedback     feedback[]
   Exame        Exame[]
+  aulas        aula[]
+  turmas       turma[]
+  atividades   atividade[]
 
   @@map("schools")
 }
@@ -70,6 +74,12 @@ model User {
   feedback      feedback[]
   notificacao   notificacao[]
   aulaAoVivo    aulaAoVivo[]
+  aulas         aula[]
+  turma         turma?        @relation("turma_alunos", fields: [turmaId], references: [id])
+  turmaId       String?
+  turmaLecionada turma[]      @relation("turma_professor")
+  atividades    atividade[]
+  atividadesRealizadas atividade_realizada[]
 
   @@map("users")
 }
@@ -117,10 +127,12 @@ model feedback {
 }
 
 model notificacao {
-  id      String @id @default(uuid())
-  content String
-  user    User   @relation(fields: [userId], references: [id])
-  userId  String
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+
   @@map("notif")
 }
 
@@ -134,6 +146,8 @@ model aulaAoVivo {
   status    StatusAgendamentos @default(AGENDADO)
   user      User               @relation(fields: [userId], references: [id])
   userId    String
+  turma     turma?             @relation(fields: [turmaId], references: [id])
+  turmaId   String?
   createdAt DateTime           @default(now())
 
   @@map("aulas_ao_vivo")
@@ -150,6 +164,70 @@ model aula {
   thumbnail     String   @default("azul")
   descricao     String
   topicos       String[]
+  videoUrl      String?
+  user          User?    @relation(fields: [userId], references: [id])
+  userId        String?
+  escola        escola?  @relation(fields: [escolaId], references: [id])
+  escolaId      String?
+  turma         turma?   @relation(fields: [turmaId], references: [id])
+  turmaId       String?
 
   @@map("aulas")
+}
+
+model turma {
+  id          String      @id @default(uuid())
+  nome        String
+  materia     String
+  status      String      @default("ativo")
+  professor   User        @relation("turma_professor", fields: [professorId], references: [id])
+  professorId String
+  escola      escola      @relation(fields: [escolaId], references: [id])
+  escolaId    String
+  alunos      User[]      @relation("turma_alunos")
+  aulas       aula[]
+  aulasAoVivo aulaAoVivo[]
+  atividades  atividade[]
+
+  @@map("turmas")
+}
+
+model atividade {
+  id            Int                  @id @default(autoincrement())
+  titulo        String
+  professor     String               @default("")
+  materia       String
+  pontos        Int                  @default(10)
+  dificuldade   String               @default("Facil")
+  descricao     String               @default("")
+  tempoEstimado String               @default("10 min")
+  cor           String               @default("azul")
+  icone         String               @default("file")
+  perguntas     Json
+  respondidas   Int                  @default(0)
+  createdAt     DateTime             @default(now())
+  user          User?                @relation(fields: [userId], references: [id])
+  userId        String?
+  escola        escola?              @relation(fields: [escolaId], references: [id])
+  escolaId      String?
+  turma         turma?               @relation(fields: [turmaId], references: [id])
+  turmaId       String?
+  realizadas    atividade_realizada[]
+
+  @@map("atividades")
+}
+
+model atividade_realizada {
+  id           Int       @id @default(autoincrement())
+  atividade    atividade @relation(fields: [atividadeId], references: [id], onDelete: Cascade)
+  atividadeId  Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  acertos      Int       @default(0)
+  erros        Int       @default(0)
+  pontosGanhos Int       @default(0)
+  createdAt    DateTime  @default(now())
+
+  @@unique([atividadeId, userId])
+  @@map("atividades_realizadas")
 }
