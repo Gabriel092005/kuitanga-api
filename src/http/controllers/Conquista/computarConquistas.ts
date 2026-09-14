@@ -14,6 +14,10 @@ export async function computarConquistas(user: UsuarioComTurma) {
   const numAulasAoVivoAgendadas = await prisma.aulaAoVivo.count({ where: { userId } });
   const numFeedbacks = await prisma.feedback.count({ where: { userId } });
   const numAtividadesRealizadas = await prisma.atividade_realizada.count({ where: { userId } });
+  const pontosAtividades = await prisma.atividade_realizada.aggregate({
+    where: { userId },
+    _sum: { pontosGanhos: true },
+  });
 
   const listarAulasUseCase = makeListarAulasUseCase();
   const { aulas } = await listarAulasUseCase.execute({
@@ -107,6 +111,8 @@ export async function computarConquistas(user: UsuarioComTurma) {
     feedbacks: numFeedbacks,
     diasNaPlataforma,
     conquistasDesbloqueadas,
+    atividadesRealizadas: numAtividadesRealizadas,
+    pontosAtividades: pontosAtividades._sum.pontosGanhos || 0,
     medalhas: regras.map(({ id, nome, descricao, atual, meta, desbloqueada }) => ({
       id,
       nome,

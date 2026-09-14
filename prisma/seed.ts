@@ -14,7 +14,7 @@ async function main() {
     },
 
 
-    
+
     {
       nome: "Professor Ana",
       email: "professor@kuitanga.com",

@@ -40,6 +40,8 @@ export async function listaAcompanhamento(request: FastifyRequest, reply: Fastif
       turma: c.turma,
       totalAulas: c.totalAulas,
       visualizacoesTotal: c.visualizacoesTotal,
+      atividadesRealizadas: c.atividadesRealizadas,
+      pontosAtividades: c.pontosAtividades,
       aulasAoVivoAgendadas: c.aulasAoVivoAgendadas,
       conquistasDesbloqueadas: c.conquistasDesbloqueadas,
       totalDeConquistas: c.medalhas.length,
