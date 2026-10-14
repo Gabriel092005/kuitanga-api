@@ -1,4 +1,5 @@
 import { PrismaClient, Role, Aluno, School, StatusMatricula } from "@prisma/client";
+import { hashPassword } from "../src/lib/password";
 
 const prisma = new PrismaClient();
 
@@ -36,7 +37,7 @@ async function main() {
       email: "encarregado@kuitanga.com",
       password_hash: "encar123",
       number: "+244 900 000 004",
-      role: Role.MEMBER,
+      role: Role.ENCARREGADO,
       Aluno: Aluno.RESPONSAVEL,
     },
   ];
@@ -44,8 +45,8 @@ async function main() {
   for (const user of usuariosDemo) {
     await prisma.user.upsert({
       where: { email: user.email },
-      update: {},
-      create: user,
+      update: { role: user.role, Aluno: user.Aluno },
+      create: { ...user, password_hash: await hashPassword(user.password_hash) },
     });
   }
 

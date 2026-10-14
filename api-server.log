@@ -3,14 +3,344 @@
 > tsx watch src/server.ts
 
 🚀HTTP Server Running
-9:22:59 PM [tsx] change in ./src\repositories\prisma\Prisma-aula-repository.ts Restarting...
-c🚀HTTP Server Running
-9:23:27 PM [tsx] change in ./src\http\controllers\Aula\routes.ts Restarting...
-c🚀HTTP Server Running
-9:23:32 PM [tsx] change in ./src\http\controllers\AulaAoVivo\solicitarAulaAoVivo.ts Restarting...
-c9:23:35 PM [tsx] change in ./src\use-cases\solicitar-aula-ao-vivo.ts Restarting...
-c🚀HTTP Server Running
-9:23:39 PM [tsx] change in ./src\use-cases\solicitar-aula-ao-vivo.ts Restarting...
-c🚀HTTP Server Running
-9:53:34 PM [tsx] change in ./src\app.ts Restarting...
-c🚀HTTP Server Running
+ZodError: [
+  {
+    "received": "ADMIN",
+    "code": "invalid_enum_value",
+    "options": [
+      "ALUNO",
+      "PROFESSOR",
+      "ENCARREGADO",
+      "MEMBER",
+      "ESTUDANTE",
+      "RESPONSAVEL",
+      "PROF",
+      "DOCENTE"
+    ],
+    "path": [
+      "tipo"
+    ],
+    "message": "Invalid enum value. Expected 'ALUNO' | 'PROFESSOR' | 'ENCARREGADO' | 'MEMBER' | 'ESTUDANTE' | 'RESPONSAVEL' | 'PROF' | 'DOCENTE', received 'ADMIN'"
+  }
+]
+    at get error (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:55:31)
+    at ZodEffects.parse (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:160:22)
+    at Object.Register (C:\Users\User\Videos\kuitanga\api\src\http\controllers\user\register.ts:43:24)
+    at preHandlerCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:138:37)
+    at validationCompleted (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:122:5)
+    at preValidationCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:99:5)
+    at handler (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:76:7)
+    at C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:199:9
+    at AsyncResource.runInAsyncScope (node:async_hooks:211:14)
+    at done (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:192:14) {
+  issues: [
+    {
+      received: 'ADMIN',
+      code: 'invalid_enum_value',
+      options: [Array],
+      path: [Array],
+      message: "Invalid enum value. Expected 'ALUNO' | 'PROFESSOR' | 'ENCARREGADO' | 'MEMBER' | 'ESTUDANTE' | 'RESPONSAVEL' | 'PROF' | 'DOCENTE', received 'ADMIN'"
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      received: 'ADMIN',
+      code: 'invalid_enum_value',
+      options: [Array],
+      path: [Array],
+      message: "Invalid enum value. Expected 'ALUNO' | 'PROFESSOR' | 'ENCARREGADO' | 'MEMBER' | 'ESTUDANTE' | 'RESPONSAVEL' | 'PROF' | 'DOCENTE', received 'ADMIN'"
+    }
+  ]
+}
+ZodError: [
+  {
+    "code": "too_small",
+    "minimum": 2,
+    "type": "string",
+    "inclusive": true,
+    "exact": false,
+    "message": "String must contain at least 2 character(s)",
+    "path": [
+      "nome"
+    ]
+  },
+  {
+    "received": "DIRETOR",
+    "code": "invalid_enum_value",
+    "options": [
+      "ALUNO",
+      "PROFESSOR",
+      "ENCARREGADO",
+      "MEMBER",
+      "ESTUDANTE",
+      "RESPONSAVEL",
+      "PROF",
+      "DOCENTE"
+    ],
+    "path": [
+      "tipo"
+    ],
+    "message": "Invalid enum value. Expected 'ALUNO' | 'PROFESSOR' | 'ENCARREGADO' | 'MEMBER' | 'ESTUDANTE' | 'RESPONSAVEL' | 'PROF' | 'DOCENTE', received 'DIRETOR'"
+  }
+]
+    at get error (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:55:31)
+    at ZodEffects.parse (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:160:22)
+    at Object.Register (C:\Users\User\Videos\kuitanga\api\src\http\controllers\user\register.ts:43:24)
+    at preHandlerCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:138:37)
+    at validationCompleted (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:122:5)
+    at preValidationCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:99:5)
+    at handler (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:76:7)
+    at C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:199:9
+    at AsyncResource.runInAsyncScope (node:async_hooks:211:14)
+    at done (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:192:14) {
+  issues: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      received: 'DIRETOR',
+      code: 'invalid_enum_value',
+      options: [Array],
+      path: [Array],
+      message: "Invalid enum value. Expected 'ALUNO' | 'PROFESSOR' | 'ENCARREGADO' | 'MEMBER' | 'ESTUDANTE' | 'RESPONSAVEL' | 'PROF' | 'DOCENTE', received 'DIRETOR'"
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      received: 'DIRETOR',
+      code: 'invalid_enum_value',
+      options: [Array],
+      path: [Array],
+      message: "Invalid enum value. Expected 'ALUNO' | 'PROFESSOR' | 'ENCARREGADO' | 'MEMBER' | 'ESTUDANTE' | 'RESPONSAVEL' | 'PROF' | 'DOCENTE', received 'DIRETOR'"
+    }
+  ]
+}
+ZodError: [
+  {
+    "code": "too_small",
+    "minimum": 2,
+    "type": "string",
+    "inclusive": true,
+    "exact": false,
+    "message": "String must contain at least 2 character(s)",
+    "path": [
+      "nome"
+    ]
+  },
+  {
+    "code": "too_small",
+    "minimum": 6,
+    "type": "string",
+    "inclusive": true,
+    "exact": false,
+    "message": "String must contain at least 6 character(s)",
+    "path": [
+      "password"
+    ]
+  }
+]
+    at get error (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:55:31)
+    at ZodEffects.parse (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:160:22)
+    at Object.Register (C:\Users\User\Videos\kuitanga\api\src\http\controllers\user\register.ts:43:24)
+    at preHandlerCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:138:37)
+    at validationCompleted (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:122:5)
+    at preValidationCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:99:5)
+    at handler (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:76:7)
+    at C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:199:9
+    at AsyncResource.runInAsyncScope (node:async_hooks:211:14)
+    at done (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:192:14) {
+  issues: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      code: 'too_small',
+      minimum: 6,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 6 character(s)',
+      path: [Array]
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      code: 'too_small',
+      minimum: 6,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 6 character(s)',
+      path: [Array]
+    }
+  ]
+}
+ZodError: [
+  {
+    "code": "too_small",
+    "minimum": 2,
+    "type": "string",
+    "inclusive": true,
+    "exact": false,
+    "message": "String must contain at least 2 character(s)",
+    "path": [
+      "nome"
+    ]
+  },
+  {
+    "code": "custom",
+    "message": "password e obrigatorio",
+    "path": [
+      "password"
+    ]
+  }
+]
+    at get error (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:55:31)
+    at ZodEffects.parse (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:160:22)
+    at Object.Register (C:\Users\User\Videos\kuitanga\api\src\http\controllers\user\register.ts:43:24)
+    at preHandlerCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:138:37)
+    at validationCompleted (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:122:5)
+    at preValidationCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:99:5)
+    at handler (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:76:7)
+    at C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:199:9
+    at AsyncResource.runInAsyncScope (node:async_hooks:211:14)
+    at done (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:192:14) {
+  issues: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      code: 'custom',
+      message: 'password e obrigatorio',
+      path: [Array]
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      code: 'custom',
+      message: 'password e obrigatorio',
+      path: [Array]
+    }
+  ]
+}
+ZodError: [
+  {
+    "code": "too_small",
+    "minimum": 2,
+    "type": "string",
+    "inclusive": true,
+    "exact": false,
+    "message": "String must contain at least 2 character(s)",
+    "path": [
+      "nome"
+    ]
+  },
+  {
+    "validation": "regex",
+    "code": "invalid_string",
+    "message": "Invalid",
+    "path": [
+      "email"
+    ]
+  }
+]
+    at get error (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:55:31)
+    at ZodEffects.parse (C:\Users\User\Videos\kuitanga\api\node_modules\zod\lib\types.js:160:22)
+    at Object.Register (C:\Users\User\Videos\kuitanga\api\src\http\controllers\user\register.ts:43:24)
+    at preHandlerCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:138:37)
+    at validationCompleted (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:122:5)
+    at preValidationCallback (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:99:5)
+    at handler (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\handleRequest.js:76:7)
+    at C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:199:9
+    at AsyncResource.runInAsyncScope (node:async_hooks:211:14)
+    at done (C:\Users\User\Videos\kuitanga\api\node_modules\fastify\lib\contentTypeParser.js:192:14) {
+  issues: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      validation: 'regex',
+      code: 'invalid_string',
+      message: 'Invalid',
+      path: [Array]
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      code: 'too_small',
+      minimum: 2,
+      type: 'string',
+      inclusive: true,
+      exact: false,
+      message: 'String must contain at least 2 character(s)',
+      path: [Array]
+    },
+    {
+      validation: 'regex',
+      code: 'invalid_string',
+      message: 'Invalid',
+      path: [Array]
+    }
+  ]
+}

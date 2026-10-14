@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Aluno, Role } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { hashPassword } from "@/lib/password";
+import { TipoDeCadastro, resolverPapeis } from "@/lib/roles";
 
 export async function adicionarAluno(request: FastifyRequest, reply: FastifyReply) {
   const adicionarAlunoParamsSchema = z.object({
@@ -12,12 +14,15 @@ export async function adicionarAluno(request: FastifyRequest, reply: FastifyRepl
     nome: z.string().min(2),
     email: z.string().email(),
     number: z.string().optional(),
-    papel: z.enum(["ALUNO", "RESPONSAVEL"]).default("ALUNO"),
+    papel: z.enum(["ALUNO", "RESPONSAVEL", "ENCARREGADO"]).default("ALUNO"),
     password: z.string().min(6).default("123456"),
   });
 
   const { id } = adicionarAlunoParamsSchema.parse(request.params);
   const { nome, email, number, papel, password } = adicionarAlunoBodySchema.parse(request.body);
+
+  const tipo: TipoDeCadastro = papel === "RESPONSAVEL" ? "ENCARREGADO" : papel;
+  const papeis = resolverPapeis(tipo);
 
   const { sub: userId, role } = request.user as { sub: string; role?: string };
   const isAdmin = role === "ADMIN";
@@ -44,13 +49,13 @@ export async function adicionarAluno(request: FastifyRequest, reply: FastifyRepl
     data: {
       nome,
       email,
-      password_hash: password,
+      password_hash: await hashPassword(password),
       number: number || "000000000",
-      role: Role.MEMBER,
-      Aluno: papel as Aluno,
+      role: papeis.role === Role.ADMIN ? Role.MEMBER : papeis.role,
+      Aluno: papeis.Aluno,
       turmaId: turma.id,
     },
-    select: { id: true, nome: true, email: true, Aluno: true },
+    select: { id: true, nome: true, email: true, role: true, Aluno: true },
   });
 
   await prisma.matricula.create({

@@ -1,44 +1,56 @@
+import { Aluno as AlunoEnum, Role, User } from "@prisma/client";
 import { usersRepository } from "@/repositories/users-repository";
-import { User } from "@prisma/client";
+import { hashPassword } from "@/lib/password";
+import { TipoDeCadastro, resolverPapeis } from "@/lib/roles";
 import { UserAreadyExistsError } from "./erros/user-already-Exists";
-import { invalidCredentialsError } from "./erros/invalid-credentials-error";
 
-interface  RegisterUseCaseRequest{
-    nome:string;
-    email:string;
-    password_hash:string;
-    number : string
+interface RegisterUseCaseRequest {
+  nome: string;
+  email: string;
+  password: string;
+  number?: string;
+  tipo: TipoDeCadastro;
+  role?: Role;
+  Aluno?: AlunoEnum;
 }
 
-
-interface RegisterUseCaseResponse{
-    user:User
+interface RegisterUseCaseResponse {
+  user: User;
 }
 
 export class RegisterUseCase {
-    constructor( private usersRepository : usersRepository ) {}
- async Execute({nome,email,password_hash,number} : RegisterUseCaseRequest)
- : Promise<RegisterUseCaseResponse>
-{
-     const userWithSameEmail = await this.usersRepository.findByEmail(email)
+  constructor(private usersRepository: usersRepository) {}
 
-  if(userWithSameEmail)
-  {
-      throw new UserAreadyExistsError()
+  async execute({
+    nome,
+    email,
+    password,
+    number,
+    tipo,
+    role,
+    Aluno,
+  }: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
+    const userWithSameEmail = await this.usersRepository.findByEmail(email);
+
+    if (userWithSameEmail) {
+      throw new UserAreadyExistsError();
+    }
+
+    const papeis = resolverPapeis(tipo);
+
+    const user = await this.usersRepository.create({
+      nome,
+      email,
+      password_hash: await hashPassword(password),
+      number: number ?? "000000000",
+      role: role ?? papeis.role,
+      Aluno: Aluno ?? papeis.Aluno,
+    });
+
+    return { user };
   }
-//    const  prismaUserRepository = new PrismaUserRepository()
-   const user  = await this.usersRepository.create({
-       nome,
-       email,
-       password_hash,
-       number
 
-   })
-   return {
-       user,
-   }   
-   
-  } 
-
+  async Execute(request: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
+    return this.execute(request);
+  }
 }
-
