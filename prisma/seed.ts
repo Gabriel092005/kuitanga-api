@@ -43,10 +43,11 @@ async function main() {
   ];
 
   for (const user of usuariosDemo) {
+    const password_hash = await hashPassword(user.password_hash);
     await prisma.user.upsert({
       where: { email: user.email },
-      update: { role: user.role, Aluno: user.Aluno },
-      create: { ...user, password_hash: await hashPassword(user.password_hash) },
+      update: { role: user.role, Aluno: user.Aluno, password_hash },
+      create: { ...user, password_hash },
     });
   }
 
